@@ -12,8 +12,8 @@ import (
 	"gopkg.in/vinxi/log.v0"
 )
 
-// TraceFunc represents the log trace function.
-type TraceFunc func(l log.Interface, w http.ResponseWriter, r *http.Request) log.Interface
+// TracerFunc represents the log trace function.
+type TracerFunc func(l log.Interface, w http.ResponseWriter, r *http.Request) log.Interface
 
 // mu provides thread synchronization for the public singleton API.
 var mu = sync.Mutex{}
@@ -67,7 +67,7 @@ func AddHook(hook logrus.Hook) {
 
 // Tracer provides HTTP tracing capabilities to incoming traffic.
 type Tracer struct {
-	tracers []TraceFunc
+	tracers []TracerFunc
 	logger  *logrus.Logger
 }
 
@@ -75,17 +75,17 @@ type Tracer struct {
 func New() *Tracer {
 	return &Tracer{
 		logger:  Logger,
-		tracers: []TraceFunc{TraceRequestInfo},
+		tracers: []TracerFunc{DefaultTracer},
 	}
 }
 
 // AddTracer adds a new custom tracer function.
-func (t *Tracer) AddTracer(tracer ...TraceFunc) {
+func (t *Tracer) AddTracer(tracer ...TracerFunc) {
 	t.tracers = append(t.tracers, tracer...)
 }
 
 // SetTracer sets one or multiple tracer functions, removing the old ones.
-func (t *Tracer) SetTracer(tracers ...TraceFunc) {
+func (t *Tracer) SetTracer(tracers ...TracerFunc) {
 	t.tracers = tracers
 }
 
@@ -103,8 +103,9 @@ func (t *Tracer) HandleHTTP(w http.ResponseWriter, r *http.Request, h http.Handl
 	h.ServeHTTP(w, r)
 }
 
-// TraceRequestInfo read request info and writes a structured trace entry into the default logger.
-func TraceRequestInfo(l log.Interface, w http.ResponseWriter, r *http.Request) log.Interface {
+// DefaultTracer reads the request info and writes a structured data entry to the default logger.
+// It's used as default tracer function. Returns an entry logger for subsequent writes.
+func DefaultTracer(l log.Interface, w http.ResponseWriter, r *http.Request) log.Interface {
 	entry := logrus.NewEntry(Logger)
 	logger := entry.WithFields(logrus.Fields{
 		"protocol":      r.Proto,
