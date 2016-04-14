@@ -3,7 +3,6 @@ language: go
 go:
   - 1.6
   - 1.5
-  - release
 
 before_install:
   - go get github.com/nbio/st
