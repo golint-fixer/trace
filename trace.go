@@ -75,7 +75,7 @@ type Tracer struct {
 func New() *Tracer {
 	return &Tracer{
 		logger:  Logger,
-		tracers: []TracerFunc{DefaultTracer},
+		tracers: []TracerFunc{defaultTracer},
 	}
 }
 
@@ -103,9 +103,9 @@ func (t *Tracer) HandleHTTP(w http.ResponseWriter, r *http.Request, h http.Handl
 	h.ServeHTTP(w, r)
 }
 
-// DefaultTracer reads the request info and writes a structured data entry to the default logger.
+// defaultTracer reads the request info and writes a structured data entry to the default logger.
 // It's used as default tracer function. Returns an entry logger for subsequent writes.
-func DefaultTracer(l log.Interface, w http.ResponseWriter, r *http.Request) log.Interface {
+func defaultTracer(l log.Interface, w http.ResponseWriter, r *http.Request) log.Interface {
 	entry := logrus.NewEntry(Logger)
 	logger := entry.WithFields(logrus.Fields{
 		"protocol":      r.Proto,
