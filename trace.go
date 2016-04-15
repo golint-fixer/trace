@@ -1,5 +1,5 @@
-// Package trace implements a featured and structured generic logger
-// interface designed to be used in core and third-party vinxi components.
+// Package trace implements a traffic tracing instrumentation for your proxies.
+// Designed to be extended to trace custom data or modify the request/response.
 package trace
 
 import (
